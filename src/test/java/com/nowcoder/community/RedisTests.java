@@ -110,6 +110,11 @@ public class RedisTests {
     }
 
     // 编程式事务
+    // Redis也是数据库，所以也有事务管理，只是它不像关系型数据库，不严格满足ACID四大特性
+    // 具体来说，它的事务管理机制是：在启用事务后，当你再去执行Redis命令时，它不会立刻执行命令，而是会把命令放到队列中
+    // 所以事务内部的命令不会立刻执行，而是统一批量地执行，所以查询语句不要放在事务中间
+    // 所以在Redis管理事务时，不要在事务中间查询，无效，不会显示结果，要么提前查，要么事务结束后再查，
+    // 演示编程式事务，由于Redis特性，声明式事务方法内部不能查询，所以不常用，用编程式事务把事务范围缩小
     @Test
     public void testTransactional() {
         Object obj = redisTemplate.execute(new SessionCallback() {
@@ -117,14 +122,18 @@ public class RedisTests {
             public Object execute(RedisOperations operations) throws DataAccessException {
                 String redisKey = "test:tx";
 
+                // 启用事务
                 operations.multi();
 
+                // 事务内部的操作
                 operations.opsForSet().add(redisKey, "zhangsan");
                 operations.opsForSet().add(redisKey, "lisi");
                 operations.opsForSet().add(redisKey, "wangwu");
 
+                // 无效操作
                 System.out.println(operations.opsForSet().members(redisKey));
 
+                // 提交事务
                 return operations.exec();
             }
         });
@@ -189,7 +198,7 @@ public class RedisTests {
         System.out.println(redisTemplate.opsForValue().getBit(redisKey, 1));
         System.out.println(redisTemplate.opsForValue().getBit(redisKey, 2));
 
-        // 统计
+        // 统计，需要通过Redis底层的连接实现，参数是回调的接口，这里做了匿名的实现
         Object obj = redisTemplate.execute(new RedisCallback() {
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {

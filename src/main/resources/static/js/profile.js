@@ -4,6 +4,7 @@ $(function(){
 
 function follow() {
 	var btn = this;
+	// btn-info是一个蓝色的样式
 	if($(btn).hasClass("btn-info")) {
 		// 关注TA
 		$.post(

@@ -40,8 +40,7 @@ public class LikeController implements CommunityConstant {
 
         // 点赞
         likeService.like(user.getId(), entityType, entityId, entityUserId);
-
-        // 数量
+        // 统计数量
         long likeCount = likeService.findEntityLikeCount(entityType, entityId);
         // 状态
         int likeStatus = likeService.findEntityLikeStatus(user.getId(), entityType, entityId);
@@ -51,6 +50,7 @@ public class LikeController implements CommunityConstant {
         map.put("likeStatus", likeStatus);
 
         // 触发点赞事件
+        // 点赞时触发即可，不点赞不用触发
         if (likeStatus == 1) {
             Event event = new Event()
                     .setTopic(TOPIC_LIKE)
@@ -58,7 +58,7 @@ public class LikeController implements CommunityConstant {
                     .setEntityType(entityType)
                     .setEntityId(entityId)
                     .setEntityUserId(entityUserId)
-                    .setData("postId", postId);
+                    .setData("postId", postId);//仍然需要帖子Id完成通知中的跳转链接
             eventProducer.fireEvent(event);
         }
 

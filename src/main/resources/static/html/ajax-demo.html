@@ -4,23 +4,26 @@
     <meta charset="UTF-8">
     <title>AJAX</title>
 </head>
+<!--<script th:src="@{/js/jquery-3.3.1.min.js}" crossorigin="anonymous"></script>-->
+<script src="../js/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+<!--这样找不到资源，路径问题， 不在template文件夹下无法使用thymeleaf自动寻址-->
+<!--<script th:src="@{/js/jquery-3.3.1.min.js}" crossorigin="anonymous"></script>-->
 <body>
     <p>
         <input type="button" value="发送" onclick="send();">
     </p>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script>
         function send() {
             $.post(
-                "/community/alpha/ajax",
-                {"name":"张三","age":23},
-                function(data) {
-                    console.log(typeof(data));
-                    console.log(data);
+                "/community/alpha/ajax", // 要访问的路径，必须绝对路径
+                {"name":"张三","age":23}, // 向服务器提交的数据，需要是js对象，js对象就是JSON格式
+                function(data) { // 声明一个回调函数，匿名的，当浏览器得到服务器的响应后，它会调这个回调方法，data就是服务器传给它的数据
+                    console.log(typeof(data)); //String类型
+                    console.log(data); // data是字符串
 
                     data = $.parseJSON(data);
-                    console.log(typeof(data));
+                    console.log(typeof(data)); //object类型
                     console.log(data.code);
                     console.log(data.msg);
                 }

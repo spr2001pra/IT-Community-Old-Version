@@ -15,9 +15,7 @@ public class MessageService {
     @Autowired
     private MessageMapper messageMapper;
 
-    @Autowired
-    private SensitiveFilter sensitiveFilter;
-
+    // 查询会话
     public List<Message> findConversations(int userId, int offset, int limit) {
         return messageMapper.selectConversations(userId, offset, limit);
     }
@@ -38,12 +36,16 @@ public class MessageService {
         return messageMapper.selectLetterUnreadCount(userId, conversationId);
     }
 
+    @Autowired
+    private SensitiveFilter sensitiveFilter;
+
     public int addMessage(Message message) {
         message.setContent(HtmlUtils.htmlEscape(message.getContent()));
         message.setContent(sensitiveFilter.filter(message.getContent()));
         return messageMapper.insertMessage(message);
     }
 
+    // 把消息变成已读
     public int readMessage(List<Integer> ids) {
         return messageMapper.updateStatus(ids, 1);
     }

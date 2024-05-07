@@ -34,8 +34,8 @@ public class HomeController implements CommunityConstant {
     @RequestMapping(path = "/index", method = RequestMethod.GET)
     public String getIndexPage(Model model, Page page,
                                @RequestParam(name = "orderMode", defaultValue = "0") int orderMode) {
-        // 方法调用钱,SpringMVC会自动实例化Model和Page,并将Page注入Model.
-        // 所以,在thymeleaf中可以直接访问Page对象中的数据.
+        // 方法调用之前，SpringMVC会自动实例化model和page, 并将page注入给model
+        // 所以，在Thymeleaf中可以直接访问Page对象中的数据，不需要写model.addAttribute("Page", Page);
         page.setRows(discussPostService.findDiscussPostRows(0));
         page.setPath("/index?orderMode=" + orderMode);
 
@@ -49,6 +49,7 @@ public class HomeController implements CommunityConstant {
                 User user = userService.findUserById(post.getUserId());
                 map.put("user", user);
 
+                // 显示点赞数量
                 long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId());
                 map.put("likeCount", likeCount);
 

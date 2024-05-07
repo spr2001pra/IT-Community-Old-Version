@@ -61,9 +61,10 @@ public class AlphaService {
         return alphaDao.select();
     }
 
-    // REQUIRED: 支持当前事务(外部事务),如果不存在则创建新事务.
-    // REQUIRES_NEW: 创建一个新事务,并且暂停当前事务(外部事务).
-    // NESTED: 如果当前存在事务(外部事务),则嵌套在该事务中执行(独立的提交和回滚),否则就会REQUIRED一样.
+    // REQUIRED: 支持当前事务(外部事务)，如果外部事物不存在则创建新事务。A调B，A就是外部事物，如果A没有事务，就按B的事务来
+    // REQUIRES_NEW: 创建一个新事务,并且暂停当前事务(外部事务)。不管A，B按照自己的来
+    // NESTED: 如果当前存在事务(外部事务)，则嵌套在该事务中执行(B的事务执行的时候，有独立的提交和回滚)，否则就会REQUIRED一样
+    // 事务的传播机制propagation，指的是A有事务，A调用了B，B也有事务的情况
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public Object save1() {
         // 新增用户
@@ -95,6 +96,8 @@ public class AlphaService {
 
         return transactionTemplate.execute(new TransactionCallback<Object>() {
             @Override
+            // 这个方法是一个回调方法，它是由TransactionTemplate底层自动调的，但它的逻辑是自定义的，我们写好后，
+            // TransactionTemplate底层自动调并完成事务管理，参数status也是由它传进来的
             public Object doInTransaction(TransactionStatus status) {
                 // 新增用户
                 User user = new User();

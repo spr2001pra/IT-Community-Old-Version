@@ -1,8 +1,6 @@
 package com.nowcoder.community.entity;
 
-/**
- * 封装分页相关的信息.
- */
+//封装分页相关的信息
 public class Page {
 
     // 当前页码
@@ -52,21 +50,13 @@ public class Page {
         this.path = path;
     }
 
-    /**
-     * 获取当前页的起始行
-     *
-     * @return
-     */
+    //获取当前页在数据库的起始行
     public int getOffset() {
         // current * limit - limit
         return (current - 1) * limit;
     }
 
-    /**
-     * 获取总页数
-     *
-     * @return
-     */
+    //获取总的页数
     public int getTotal() {
         // rows / limit [+1]
         if (rows % limit == 0) {
@@ -76,21 +66,13 @@ public class Page {
         }
     }
 
-    /**
-     * 获取起始页码
-     *
-     * @return
-     */
+    //获取起始页码,不可能有100页就在页面底部显示100个页码，都是显示一小段
     public int getFrom() {
         int from = current - 2;
         return from < 1 ? 1 : from;
     }
 
-    /**
-     * 获取结束页码
-     *
-     * @return
-     */
+    //获取结束页码
     public int getTo() {
         int to = current + 2;
         int total = getTotal();

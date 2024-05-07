@@ -20,7 +20,7 @@ public interface LoginTicketMapper {
     })
     LoginTicket selectByTicket(String ticket);
 
-    @Update({
+    @Update({// 注解方法下动态sql演示
             "<script>",
             "update login_ticket set status=#{status} where ticket=#{ticket} ",
             "<if test=\"ticket!=null\"> ",

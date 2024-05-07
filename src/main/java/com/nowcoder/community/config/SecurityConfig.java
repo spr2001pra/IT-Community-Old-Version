@@ -29,11 +29,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
     protected void configure(HttpSecurity http) throws Exception {
         // 授权
         http.authorizeRequests()
-                .antMatchers(
+                .antMatchers( // 需要登录才可以访问的功能，任意权限均可
                         "/user/setting",
                         "/user/upload",
-                        "/discuss/add",
-                        "/comment/add/**",
+                        "/discuss/add", // 发帖
+                        "/comment/add/**", // **代表下级，所有的功能
                         "/letter/**",
                         "/notice/**",
                         "/like",
@@ -68,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                     // 没有登录
                     @Override
                     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
-                        String xRequestedWith = request.getHeader("x-requested-with");
+                        String xRequestedWith = request.getHeader("x-requested-with"); // 判断是同步还是异步请求
                         if ("XMLHttpRequest".equals(xRequestedWith)) {
                             response.setContentType("application/plain;charset=utf-8");
                             PrintWriter writer = response.getWriter();

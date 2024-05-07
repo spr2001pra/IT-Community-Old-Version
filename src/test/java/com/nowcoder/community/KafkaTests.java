@@ -25,6 +25,9 @@ public class KafkaTests {
         kafkaProducer.sendMessage("test", "在吗");
 
         try {
+            // 生产者是主动的，需要调用才可以发消息，什么时候调用，什么时候就发消息；
+            // 消费者是被动的，只要topic里有消息，就会一直读取，但是会有一定的延迟;
+            // 所以这里要阻塞程序一段时间以看到消费者的处理过程
             Thread.sleep(1000 * 10);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -48,7 +51,7 @@ class KafkaProducer {
 @Component
 class KafkaConsumer {
 
-    @KafkaListener(topics = {"test"})
+    @KafkaListener(topics = {"test"})// 如果topics没有消息就阻塞，如果有消息就读取，消费者进程持续监听topics
     public void handleMessage(ConsumerRecord record) {
         System.out.println(record.value());
     }

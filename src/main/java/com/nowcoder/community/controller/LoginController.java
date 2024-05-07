@@ -33,20 +33,6 @@ import java.util.concurrent.TimeUnit;
 @Controller
 public class LoginController implements CommunityConstant {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private Producer kaptchaProducer;
-
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
     @RequestMapping(path = "/register", method = RequestMethod.GET)
     public String getRegisterPage() {
         return "/site/register";
@@ -56,6 +42,9 @@ public class LoginController implements CommunityConstant {
     public String getLoginPage() {
         return "/site/login";
     }
+
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public String register(Model model, User user) {
@@ -89,6 +78,17 @@ public class LoginController implements CommunityConstant {
         return "/site/operate-result";
     }
 
+    @Autowired
+    private Producer kaptchaProducer;
+
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
     @RequestMapping(path = "/kaptcha", method = RequestMethod.GET)
     public void getKaptcha(HttpServletResponse response/*, HttpSession session*/) {
         // 生成验证码
@@ -104,6 +104,7 @@ public class LoginController implements CommunityConstant {
         cookie.setMaxAge(60);
         cookie.setPath(contextPath);
         response.addCookie(cookie);
+
         // 将验证码存入Redis
         String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
         redisTemplate.opsForValue().set(redisKey, text, 60, TimeUnit.SECONDS);
@@ -152,10 +153,10 @@ public class LoginController implements CommunityConstant {
     }
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
-    public String logout(@CookieValue("ticket") String ticket) {
+    public String logout(@CookieValue("ticket") String ticket) {//浏览器会自动传cookie至服务器，可通过注解获得
         userService.logout(ticket);
         SecurityContextHolder.clearContext();
-        return "redirect:/login";
+        return "redirect:/login";//重定向默认选择get请求的路径(有两个/login路径)
     }
 
 }

@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Component //各层次通用的工具注解
 public class SensitiveFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(SensitiveFilter.class);
@@ -25,10 +25,14 @@ public class SensitiveFilter {
     // 根节点
     private TrieNode rootNode = new TrieNode();
 
+    // 该注解表示这是一个初始化方法，当容器实例化SensitiveFilter Bean以后，调用它的构造器之后，初始化方法会被自动地调用；
+    // 那Bean什么时候初始化呢，服务启动的时候Bean就初始化了
     @PostConstruct
     public void init() {
         try (
+                // 这句话加载后得到一个字节流
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream("sensitive-words.txt");
+                // 字节流中读文字不方便，需要转化成字符流，字符流效率低，再转成缓冲流，读取数据效率高
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         ) {
             String keyword;
@@ -55,6 +59,8 @@ public class SensitiveFilter {
             }
 
             // 指向子节点,进入下一轮循环
+            // 先下一轮，再设置结束，从定义类本身理解数据结构，每一个结点不包含数据，只有一个自己的标记和记录它下层结点的map，
+            // 当赌这一层的下一层加入博时，创建了新结点，用key命名为博，随后再把这个结点的标记设置为False
             tempNode = subNode;
 
             // 设置结束标识
@@ -100,7 +106,7 @@ public class SensitiveFilter {
             }
 
             // 检查下级节点
-            tempNode = tempNode.getSubNode(c);
+            tempNode = tempNode.getSubNode(c);//以赌博为例，当c为赌这一层时，它的map里由key为博的结点，它的标记是true，
             if (tempNode == null) {
                 // 以begin开头的字符串不是敏感词
                 sb.append(text.charAt(begin));
@@ -134,6 +140,8 @@ public class SensitiveFilter {
     }
 
     // 前缀树
+    // 从这个定义类的本身理解数据结构，每一个结点不包含数据，只有一个自己的标记和记录它下层结点的map；
+    // 用map的key和value之间的关系来模拟树各个结点之间的关系，一种新的定义树的方式
     private class TrieNode {
 
         // 关键词结束标识

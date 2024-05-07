@@ -46,14 +46,14 @@ public class ElasticsearchTests {
     private ElasticsearchTemplate elasticTemplate;
 
     @Test
-    public void testInsert() {
+    public void testInsert() { // 插入一条数据
         discussRepository.save(discussMapper.selectDiscussPostById(241));
         discussRepository.save(discussMapper.selectDiscussPostById(242));
         discussRepository.save(discussMapper.selectDiscussPostById(243));
     }
 
     @Test
-    public void testInsertList() {
+    public void testInsertList() { // 插入多条数据
         discussRepository.saveAll(discussMapper.selectDiscussPosts(101, 0, 100, 0));
         discussRepository.saveAll(discussMapper.selectDiscussPosts(102, 0, 100, 0));
         discussRepository.saveAll(discussMapper.selectDiscussPosts(103, 0, 100, 0));
@@ -66,20 +66,21 @@ public class ElasticsearchTests {
     }
 
     @Test
-    public void testUpdate() {
+    public void testUpdate() { // 修改数据，其实就是调用save方法覆盖一次
         DiscussPost post = discussMapper.selectDiscussPostById(231);
         post.setContent("我是新人,使劲灌水.");
         discussRepository.save(post);
     }
 
     @Test
-    public void testDelete() {
-        // discussRepository.deleteById(231);
-        discussRepository.deleteAll();
+    public void testDelete() { // 删除数据
+        discussRepository.deleteById(231);
+//        discussRepository.deleteAll(); // 删除该索引内的所有数据，危险操作，很少执行
     }
 
     @Test
-    public void testSearchByRepository() {
+    public void testSearchByRepository() { // 利用Repository完成搜索
+        // 构造查询条件
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(QueryBuilders.multiMatchQuery("互联网寒冬", "title", "content"))
                 .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
@@ -92,8 +93,8 @@ public class ElasticsearchTests {
                 ).build();
 
         // elasticTemplate.queryForPage(searchQuery, class, SearchResultMapper)
-        // 底层获取得到了高亮显示的值, 但是没有返回.
-
+        // 底层获取得到了高亮显示的值, 但是没有返回.没有做进一步的处理，所以这是一种不完善的方案
+        // page可理解成set
         Page<DiscussPost> page = discussRepository.search(searchQuery);
         System.out.println(page.getTotalElements());
         System.out.println(page.getTotalPages());
@@ -105,7 +106,7 @@ public class ElasticsearchTests {
     }
 
     @Test
-    public void testSearchByTemplate() {
+    public void testSearchByTemplate() { // 利用Template完成搜索
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(QueryBuilders.multiMatchQuery("互联网寒冬", "title", "content"))
                 .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))

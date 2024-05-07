@@ -54,7 +54,7 @@ public class ThreadPoolTests {
     // 1.JDK普通线程池
     @Test
     public void testExecutorService() {
-        Runnable task = new Runnable() {
+        Runnable task = new Runnable() { // 提供线程体，其中放置执行的业务，会自动将其装入线程执行
             @Override
             public void run() {
                 logger.debug("Hello ExecutorService");
@@ -83,7 +83,7 @@ public class ThreadPoolTests {
         sleep(30000);
     }
 
-    // 3.Spring普通线程池
+    // 3.Spring普通线程池，由于配置(最大队列等)，比JDK更加灵活
     @Test
     public void testThreadPoolTaskExecutor() {
         Runnable task = new Runnable() {
@@ -126,7 +126,7 @@ public class ThreadPoolTests {
         sleep(10000);
     }
 
-    // 6.Spring定时任务线程池(简化)
+    // 6.Spring定时任务线程池(简化)，该方法会被Spring自动调用，本体在AlphaService.java中，最后一个方法
     @Test
     public void testThreadPoolTaskSchedulerSimple() {
         sleep(30000);

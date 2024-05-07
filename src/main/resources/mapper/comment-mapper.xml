@@ -13,17 +13,17 @@
     </sql>
 
     <select id="selectCommentsByEntity" resultType="Comment">
-        select <include refid="selectFields"></include>
+        select <include refid="selectFields"/>
         from comment
-        where status = 0
+        where status = 0 /*status=0表示数据是有效的*/
         and entity_type = #{entityType}
         and entity_id = #{entityId}
-        order by create_time asc
-        limit #{offset}, #{limit}
+        order by create_time asc /*asc是正序排列*/
+        limit #{offset}, #{limit} /*数据库提供的分页功能*/
     </select>
 
     <select id="selectCountByEntity" resultType="int">
-        select count(id)
+        select count(id) /*count(id)按照id计数*/
         from comment
         where status = 0
         and entity_type = #{entityType}
@@ -31,12 +31,12 @@
     </select>
 
     <insert id="insertComment" parameterType="Comment">
-        insert into comment(<include refid="insertFields"></include>)
+        insert into comment(<include refid="insertFields"/>)
         values(#{userId},#{entityType},#{entityId},#{targetId},#{content},#{status},#{createTime})
     </insert>
 
     <select id="selectCommentById" resultType="Comment">
-        select <include refid="selectFields"></include>
+        select <include refid="selectFields"/>
         from comment
         where id = #{id}
     </select>

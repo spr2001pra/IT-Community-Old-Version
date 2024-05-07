@@ -26,6 +26,15 @@ public class UserService implements CommunityConstant {
     @Autowired
     private UserMapper userMapper;
 
+    public User findUserById(int id) {
+//        return userMapper.selectById(id);
+        User user = getCache(id);
+        if (user == null) {
+            user = initCache(id);
+        }
+        return user;
+    }
+
     @Autowired
     private MailClient mailClient;
 
@@ -38,25 +47,10 @@ public class UserService implements CommunityConstant {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
-//    @Autowired
-//    private LoginTicketMapper loginTicketMapper;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
-    public User findUserById(int id) {
-//        return userMapper.selectById(id);
-        User user = getCache(id);
-        if (user == null) {
-            user = initCache(id);
-        }
-        return user;
-    }
-
     public Map<String, Object> register(User user) {
         Map<String, Object> map = new HashMap<>();
 
-        // 空值处理
+        // 对空值做一些判断的处理，User不可为空
         if (user == null) {
             throw new IllegalArgumentException("参数不能为空!");
         }
@@ -97,10 +91,10 @@ public class UserService implements CommunityConstant {
         user.setCreateTime(new Date());
         userMapper.insertUser(user);
 
-        // 激活邮件
+        // 发送激活邮件
         Context context = new Context();
         context.setVariable("email", user.getEmail());
-        // http://localhost:8080/community/activation/101/code
+        // 确定激活路径：http://localhost:8080/community/activation/101/code
         String url = domain + contextPath + "/activation/" + user.getId() + "/" + user.getActivationCode();
         context.setVariable("url", url);
         String content = templateEngine.process("/mail/activation", context);
@@ -122,6 +116,12 @@ public class UserService implements CommunityConstant {
         }
     }
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
+
     public Map<String, Object> login(String username, String password, long expiredSeconds) {
         Map<String, Object> map = new HashMap<>();
 
@@ -135,7 +135,7 @@ public class UserService implements CommunityConstant {
             return map;
         }
 
-        // 验证账号
+        // （合法性）验证账号
         User user = userMapper.selectByName(username);
         if (user == null) {
             map.put("usernameMsg", "该账号不存在!");
@@ -189,6 +189,27 @@ public class UserService implements CommunityConstant {
         int rows = userMapper.updateHeader(userId, headerUrl);
         clearCache(userId);
         return rows;
+    }
+
+    public Map<String, Object> updataPassword(int userId, String originPassword, String newPassword, String newPasswordAgain){
+        Map<String, Object> map = new HashMap<>();
+
+        User user = userMapper.selectById(userId);
+        originPassword = CommunityUtil.md5(originPassword + user.getSalt());
+
+        if(!user.getPassword().equals(originPassword)){
+            map.put("originalPasswordMsg", "原始密码输入错误！");
+            return map;
+        }
+
+        if(!newPassword.equals(newPasswordAgain)){
+            map.put("newPasswordMsg", "两次输入的密码不一致！");
+            return map;
+        }
+
+        newPassword = CommunityUtil.md5(newPassword + user.getSalt());
+        userMapper.updatePassword(userId, newPassword);
+        return map;
     }
 
     public User findUserByName(String username) {

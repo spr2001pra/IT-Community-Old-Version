@@ -19,12 +19,7 @@ public class CommentService implements CommunityConstant {
     @Autowired
     private CommentMapper commentMapper;
 
-    @Autowired
-    private SensitiveFilter sensitiveFilter;
-
-    @Autowired
-    private DiscussPostService discussPostService;
-
+    // 查询某一页数据，返回集合
     public List<Comment> findCommentsByEntity(int entityType, int entityId, int offset, int limit) {
         return commentMapper.selectCommentsByEntity(entityType, entityId, offset, limit);
     }
@@ -32,6 +27,12 @@ public class CommentService implements CommunityConstant {
     public int findCommentCount(int entityType, int entityId) {
         return commentMapper.selectCountByEntity(entityType, entityId);
     }
+
+    @Autowired
+    private SensitiveFilter sensitiveFilter;
+
+    @Autowired
+    private DiscussPostService discussPostService;
 
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public int addComment(Comment comment) {
@@ -47,6 +48,7 @@ public class CommentService implements CommunityConstant {
         // 更新帖子评论数量
         if (comment.getEntityType() == ENTITY_TYPE_POST) {
             int count = commentMapper.selectCountByEntity(comment.getEntityType(), comment.getEntityId());
+            // 利用帖子id更新评论数量，当前帖子id就是comment.getEntityId()，因为实体类型是帖子，所以实体id就是帖子id
             discussPostService.updateCommentCount(comment.getEntityId(), count);
         }
 

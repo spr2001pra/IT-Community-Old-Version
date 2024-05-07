@@ -30,9 +30,6 @@ public class FollowController implements CommunityConstant {
     private HostHolder hostHolder;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private EventProducer eventProducer;
 
     @RequestMapping(path = "/follow", method = RequestMethod.POST)
@@ -48,7 +45,8 @@ public class FollowController implements CommunityConstant {
                 .setUserId(hostHolder.getUser().getId())
                 .setEntityType(entityType)
                 .setEntityId(entityId)
-                .setEntityUserId(entityId);
+                .setEntityUserId(entityId);// 这里因为开发场景中目前只有关注用户一种情况，所以entityId = entityUserId，当前这样处理即可
+        // 这里跳转到粉丝界面或者关注者的主页，所以不需要帖子id
         eventProducer.fireEvent(event);
 
         return CommunityUtil.getJSONString(0, "已关注!");
@@ -63,6 +61,9 @@ public class FollowController implements CommunityConstant {
 
         return CommunityUtil.getJSONString(0, "已取消关注!");
     }
+
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(path = "/followees/{userId}", method = RequestMethod.GET)
     public String getFollowees(@PathVariable("userId") int userId, Page page, Model model) {
@@ -116,7 +117,6 @@ public class FollowController implements CommunityConstant {
         if (hostHolder.getUser() == null) {
             return false;
         }
-
         return followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
     }
 

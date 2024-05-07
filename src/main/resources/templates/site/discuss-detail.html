@@ -3,11 +3,11 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+	<link rel="icon" href="../community/img/logo.jpg"/>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" crossorigin="anonymous">
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
 	<link rel="stylesheet" th:href="@{/css/discuss-detail.css}" />
-	<title>牛客网-帖子详情</title>
+	<title>我爱技术网-帖子详情</title>
 </head>
 <body>
 	<div class="nk-container">
@@ -79,7 +79,7 @@
 				</h6>
 				<!-- 作者 -->
 				<div class="media pb-3 border-bottom">
-					<a href="profile.html">
+					<a th:href="@{|/user/profile/${user.id}|}">
 						<img th:src="${user.headerUrl}" class="align-self-start mr-4 rounded-circle user-header" alt="用户头像" >
 					</a>
 					<div class="media-body">
@@ -87,6 +87,7 @@
 						<div class="text-muted mt-3">
 							发布于 <b th:text="${#dates.format(post.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</b>
 							<ul class="d-inline float-right">
+								<!--href="javascript:;"表示超链接失效，此处的处理将超链接变成单击事件，后面的this指的是当前你点的节点，就是页面上这个超链接，这个参数帮助确定具体点赞的是帖子还是评论-->
 								<li class="d-inline ml-2">
 									<a href="javascript:;" th:onclick="|like(this,1,${post.id},${post.userId},${post.id});|" class="text-primary">
 										<b th:text="${likeStatus==1?'已赞':'赞'}">赞</b> <i th:text="${likeCount}">11</i>
@@ -122,7 +123,7 @@
 				<!-- 回帖列表 -->
 				<ul class="list-unstyled mt-4">
 					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="cvo:${comments}">
-						<a href="profile.html">
+						<a th:href="@{|/user/profile/${cvo.user.id}|}">
 							<img th:src="${cvo.user.headerUrl}" class="align-self-start mr-4 rounded-circle user-header" alt="用户头像" >
 						</a>
 						<div class="media-body">
@@ -172,6 +173,7 @@
 											<li class="d-inline ml-2">|</li>
 											<li class="d-inline ml-2"><a th:href="|#huifu-${rvoStat.count}|" data-toggle="collapse" class="text-primary">回复</a></li>
 										</ul>
+										<!-- 点击首页的回复按钮，弹出回复框，这个框必须要和它所在的灰色方块匹配，需要动态维护这个匹配关系，体现在上面一行的href和下面一行的id -->
 										<div th:id="|huifu-${rvoStat.count}|" class="mt-4 collapse">
 											<form method="post" th:action="@{|/comment/add/${post.id}|}">
 												<div>
@@ -189,6 +191,7 @@
 								</li>
 
 								<!-- 回复输入框 -->
+								<!--不针对某个人某条评论的评论-->
 								<li class="pb-3 pt-3">
 									<form method="post" th:action="@{|/comment/add/${post.id}|}">
 										<div>
@@ -277,13 +280,13 @@
 							<div class="col">
 								<ul class="nav btn-group-vertical company-info">
 									<li class="nav-item text-white-50">
-										公司地址：北京市朝阳区大屯路东金泉时代3-2708北京牛客科技有限公司
+										公司地址：北京市朝阳区大屯路东金泉时代3-2708北京我爱技术网科技有限公司
 									</li>
 									<li class="nav-item text-white-50">
 										联系方式：010-60728802(电话)&nbsp;&nbsp;&nbsp;&nbsp;admin@nowcoder.com
 									</li>
 									<li class="nav-item text-white-50">
-										牛客科技©2018 All rights reserved
+										我爱技术网科技©2018 All rights reserved
 									</li>
 									<li class="nav-item text-white-50">
 										京ICP备14055008号-4 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -298,9 +301,9 @@
 			</div>
 		</footer>
 	</div>
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+	<script th:src="@{/js/jquery-3.3.1.min.js}" crossorigin="anonymous"></script>
+	<script th:src="@{/js/popper.min.js}" crossorigin="anonymous"></script>
+	<script th:src="@{/js/bootstrap.min.js}" crossorigin="anonymous"></script>
 	<script th:src="@{/js/global.js}"></script>
 	<script th:src="@{/js/discuss.js}"></script>
 </body>

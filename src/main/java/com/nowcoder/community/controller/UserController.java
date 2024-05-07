@@ -25,10 +25,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/user")
 public class UserController implements CommunityConstant {
+
+    @LoginRequired
+    @RequestMapping(path = "/setting", method = RequestMethod.GET)
+    public String getSettingPage() {
+        return "/site/setting";
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -47,18 +54,6 @@ public class UserController implements CommunityConstant {
     @Autowired
     private HostHolder hostHolder;
 
-    @Autowired
-    private LikeService likeService;
-
-    @Autowired
-    private FollowService followService;
-
-    @LoginRequired
-    @RequestMapping(path = "/setting", method = RequestMethod.GET)
-    public String getSettingPage() {
-        return "/site/setting";
-    }
-
     @LoginRequired
     @RequestMapping(path = "/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model) {
@@ -67,6 +62,7 @@ public class UserController implements CommunityConstant {
             return "/site/setting";
         }
 
+        //获取文件名后缀并判断
         String fileName = headerImage.getOriginalFilename();
         String suffix = fileName.substring(fileName.lastIndexOf("."));
         if (StringUtils.isBlank(suffix)) {
@@ -99,13 +95,15 @@ public class UserController implements CommunityConstant {
     public void getHeader(@PathVariable("fileName") String fileName, HttpServletResponse response) {
         // 服务器存放路径
         fileName = uploadPath + "/" + fileName;
-        // 文件后缀
+        // 获取文件名后缀
         String suffix = fileName.substring(fileName.lastIndexOf("."));
         // 响应图片
+        // 图片是二进制数据，要用到字节流
+        // 图片响应类型默认是"image/" + 后缀
         response.setContentType("image/" + suffix);
         try (
-                FileInputStream fis = new FileInputStream(fileName);
-                OutputStream os = response.getOutputStream();
+                FileInputStream fis = new FileInputStream(fileName);// 相当于后面加final，final中自动执行fis.close()方法
+                OutputStream os = response.getOutputStream();//SspringMVC中管理输出流，会自动关闭，但输入流是自定义的，需要手动关闭
         ) {
             byte[] buffer = new byte[1024];
             int b = 0;
@@ -117,10 +115,34 @@ public class UserController implements CommunityConstant {
         }
     }
 
+    @LoginRequired
+    @RequestMapping(path = "/updatePassword", method = RequestMethod.POST)
+    public String updatePassword(Model model, String originalPassword, String newPassword, String newPasswordAgain){
+        User user = hostHolder.getUser();
+        Map<String, Object> map = userService.updataPassword(user.getId(), originalPassword, newPassword, newPasswordAgain);
+
+        if(map.containsKey("originalPasswordMsg")){
+            model.addAttribute("originalPasswordMsg", map.get("originalPasswordMsg"));
+            return "/site/setting";
+        }
+        if(map.containsKey("newPasswordMsg")){
+            model.addAttribute("newPasswordMsg", map.get("newPasswordMsg"));
+            return "/site/setting";
+        }
+        return "redirect:/index";
+    }
+
+    @Autowired
+    private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
+
     // 个人主页
     @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
     public String getProfilePage(@PathVariable("userId") int userId, Model model) {
         User user = userService.findUserById(userId);
+        // 防止恶意攻击，如有人用一个错误的数据传入然后反复查找
         if (user == null) {
             throw new RuntimeException("该用户不存在!");
         }
@@ -139,7 +161,7 @@ public class UserController implements CommunityConstant {
         model.addAttribute("followerCount", followerCount);
         // 是否已关注
         boolean hasFollowed = false;
-        if (hostHolder.getUser() != null) {
+        if (hostHolder.getUser() != null) {// 若未登录，则一定处于未关注状态
             hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
         }
         model.addAttribute("hasFollowed", hasFollowed);

@@ -50,14 +50,15 @@ public class CommentController implements CommunityConstant {
                 .setUserId(hostHolder.getUser().getId())
                 .setEntityType(comment.getEntityType())
                 .setEntityId(comment.getEntityId())
-                .setData("postId", discussPostId);
-        if (comment.getEntityType() == ENTITY_TYPE_POST) {
+                .setData("postId", discussPostId);// 需要帖子Id完成通知中的跳转链接，由于有的event不需要帖子Id，所以没有设计相关属性，个性化信息存储到map(data)中即可
+        if (comment.getEntityType() == ENTITY_TYPE_POST) {// 触发事件的评论是针对帖子的
             DiscussPost target = discussPostService.findDiscussPostById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
-        } else if (comment.getEntityType() == ENTITY_TYPE_COMMENT) {
+        } else if (comment.getEntityType() == ENTITY_TYPE_COMMENT) {// 触发事件的评论是针对评论的
             Comment target = commentService.findCommentById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
         }
+        // event拼好后，直接扔到队列中，丝毫不会影响后续业务的进行，消费者慢慢处理即可，最多一两秒的延迟
         eventProducer.fireEvent(event);
 
         if (comment.getEntityType() == ENTITY_TYPE_POST) {

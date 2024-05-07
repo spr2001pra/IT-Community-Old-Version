@@ -20,18 +20,22 @@ public class ServiceLogAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceLogAspect.class);
 
-    @Pointcut("execution(* com.nowcoder.community.service.*.*(..))")
-    public void pointcut() {
+    @Pointcut("execution (* com.nowcoder.community.service.*.*(..))")
+    public void pointCut(){
 
     }
 
-    @Before("pointcut()")
-    public void before(JoinPoint joinPoint) {
+    @Before("pointCut()")
+    public void before(JoinPoint joinPoint){
         // 用户[1.2.3.4],在[xxx],访问了[com.nowcoder.community.service.xxx()].
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        // 此处若没有if会在系统通知功能报空指针异常，attributes可能会为空，因为aop是加在所有的service之上的，没有消费者之前，所有的调用service都是由controller完成的，现在有了消费者，它也会调用service，它调用时没有request，所以由空指针异常
         if (attributes == null) {
             return;
         }
+
+//        assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
         String ip = request.getRemoteHost();
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
