@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="icon" href="../community/img/logo.jpg"/>
-	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" crossorigin="anonymous">
+	<link rel="icon" href="../community/img/logo.jpg">
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" crossorigin="anonymous"/>
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
 	<title>我爱技术网-个人主页</title>
 </head>
@@ -65,13 +65,13 @@
 				<div class="position-relative">
 					<ul class="nav nav-tabs">
 						<li class="nav-item">
-							<a class="nav-link active" href="profile.html">个人信息</a>
+							<a class="nav-link active" th:href="@{|/user/profile/${loginUser.id}|}">个人信息</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="my-post.html">我的帖子</a>
+							<a class="nav-link" th:href="@{|/user/profile/${loginUser.id}/my-post|}">我的帖子</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="my-reply.html">我的回复</a>
+							<a class="nav-link" th:href="@{|/user/profile/${loginUser.id}/my-reply|}">我的回贴</a>
 						</li>
 					</ul>
 				</div>

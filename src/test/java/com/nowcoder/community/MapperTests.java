@@ -4,10 +4,8 @@ import com.nowcoder.community.dao.DiscussPostMapper;
 import com.nowcoder.community.dao.LoginTicketMapper;
 import com.nowcoder.community.dao.MessageMapper;
 import com.nowcoder.community.dao.UserMapper;
-import com.nowcoder.community.entity.DiscussPost;
-import com.nowcoder.community.entity.LoginTicket;
-import com.nowcoder.community.entity.Message;
-import com.nowcoder.community.entity.User;
+import com.nowcoder.community.entity.*;
+import com.nowcoder.community.service.CommentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +125,23 @@ public class MapperTests {
         count = messageMapper.selectLetterUnreadCount(131, "111_131");
         System.out.println(count);
 
+    }
+
+    @Autowired
+    private CommentService commentService;
+
+    @Test
+    public void testSelectCommentsByUser(){
+        List<Comment> list = commentService.findCommentsByUser(1, 150, 0, 5);
+        for (Comment comment : list){
+            System.out.println(comment);
+        }
+    }
+
+    @Test
+    public void testCommentsCountByUser(){
+        int ans = commentService.findUserCommentCount(1, 150);
+        System.out.println(ans);
     }
 
 }

@@ -12,8 +12,14 @@ public interface CommentMapper {
     // OFFSET 关键字用于指定从结果集(数据库)的哪一行开始返回数据，是索引值，从零开始
     List<Comment> selectCommentsByEntity(int entityType, int entityId, int offset, int limit);
 
-    // 查询数据的条目数
+    // 以用户为参考，查询某个用户的回复
+    List<Comment> selectCommentsByUser(int entityType, int userId, int offset, int limit);
+
+    // 以帖子为参考，查询针对该帖子(回帖)的回复数，查询数据的条目数
     int selectCountByEntity(int entityType, int entityId);
+
+    // 以用户为参考，查询某用户的回复数，查询数据的条目数
+    int selectCountByUser(int entityType, int userId);
 
     int insertComment(Comment comment);
 

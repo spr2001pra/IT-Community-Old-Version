@@ -1,10 +1,11 @@
 package com.nowcoder.community.controller;
 
 import com.nowcoder.community.annotation.LoginRequired;
+import com.nowcoder.community.entity.Comment;
+import com.nowcoder.community.entity.DiscussPost;
+import com.nowcoder.community.entity.Page;
 import com.nowcoder.community.entity.User;
-import com.nowcoder.community.service.FollowService;
-import com.nowcoder.community.service.LikeService;
-import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.service.*;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
@@ -18,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +27,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -167,6 +172,70 @@ public class UserController implements CommunityConstant {
         model.addAttribute("hasFollowed", hasFollowed);
 
         return "/site/profile";
+    }
+
+    @Autowired
+    private DiscussPostService discussPostService;
+
+    @RequestMapping(path = "/profile/{userId}/my-post", method = RequestMethod.GET)
+    public String getMyPostPage(Model model, Page page, @PathVariable("userId") int userId) {
+        page.setRows(discussPostService.findDiscussPostRows(userId));
+        page.setPath("/profile/userId/my-post");
+
+        List<DiscussPost> list = discussPostService
+                .findDiscussPosts(userId, page.getOffset(), page.getLimit(), 0);
+        List<Map<String, Object>> discussPosts = new ArrayList<>();
+        if (list != null) {
+            for (DiscussPost post : list) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("post", post);
+                User user = userService.findUserById(post.getUserId());
+                map.put("user", user);
+
+                // 显示点赞数量
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId());
+                map.put("likeCount", likeCount);
+
+                discussPosts.add(map);
+            }
+        }
+        model.addAttribute("discussPosts", discussPosts);
+        model.addAttribute("discussPostsTotal", discussPostService.findDiscussPostRows(userId));
+
+        return "/site/my-post";
+    }
+
+    @Autowired
+    private CommentService commentService;
+
+    @RequestMapping(path = "/profile/{userId}/my-reply", method = RequestMethod.GET)
+    public String getMyReplyPage(Model model, Page page, @PathVariable("userId") int userId) {
+        page.setRows(commentService.findUserCommentCount(1, userId));
+        page.setPath("/profile/userId/my-reply");
+
+        List<Comment> list = commentService
+                .findCommentsByUser(1, userId, page.getOffset(), page.getLimit());
+        List<Map<String, Object>> comments = new ArrayList<>();
+        if (list != null) {
+            for (Comment comment : list) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("comment", comment);
+                DiscussPost discussPost = discussPostService.findDiscussPostById(comment.getEntityId());
+                map.put("post", discussPost);
+                User user = userService.findUserById(discussPost.getUserId());
+                map.put("user", user);
+
+                // 显示点赞数量
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, comment.getId());
+                map.put("likeCount", likeCount);
+
+                comments.add(map);
+            }
+        }
+        model.addAttribute("comments", comments);
+        model.addAttribute("commentsTotal", commentService.findUserCommentCount(1, userId));
+
+        return "/site/my-reply";
     }
 
 }
