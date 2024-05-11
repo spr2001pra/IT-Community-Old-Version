@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                 .antMatchers( // 需要登录才可以访问的功能，任意权限均可
                         "/user/setting",
                         "/user/upload",
+                        "/user/profile/**", //新增，未登录不可访问个人主页
                         "/discuss/add", // 发帖
                         "/comment/add/**", // **代表下级，所有的功能
                         "/letter/**",
@@ -45,14 +46,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                         AUTHORITY_ADMIN,
                         AUTHORITY_MODERATOR
                 )
+//                .antMatchers(
+//                        "/discuss/top",
+//                        "/discuss/wonderful"
+//                )
+//                .hasAnyAuthority(
+//                        AUTHORITY_MODERATOR
+//                )
                 .antMatchers(
                         "/discuss/top",
-                        "/discuss/wonderful"
-                )
-                .hasAnyAuthority(
-                        AUTHORITY_MODERATOR
-                )
-                .antMatchers(
+                        "/discuss/wonderful",
                         "/discuss/delete",
                         "/data/**"
                 )
