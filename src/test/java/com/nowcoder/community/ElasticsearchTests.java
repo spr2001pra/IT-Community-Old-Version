@@ -47,9 +47,16 @@ public class ElasticsearchTests {
 
     @Test
     public void testInsert() { // 插入一条数据
-        discussRepository.save(discussMapper.selectDiscussPostById(241));
-        discussRepository.save(discussMapper.selectDiscussPostById(242));
-        discussRepository.save(discussMapper.selectDiscussPostById(243));
+//        discussRepository.save(discussMapper.selectDiscussPostById(241));
+//        discussRepository.save(discussMapper.selectDiscussPostById(242));
+//        discussRepository.save(discussMapper.selectDiscussPostById(243));
+        discussRepository.save(discussMapper.selectDiscussPostById(265));
+        for (int i = 270; i <= 277; i++) {
+            discussRepository.save(discussMapper.selectDiscussPostById(i));
+        }
+        for (int i = 280; i <= 284; i++) {
+            discussRepository.save(discussMapper.selectDiscussPostById(i));
+        }
     }
 
     @Test
@@ -64,7 +71,7 @@ public class ElasticsearchTests {
         discussRepository.saveAll(discussMapper.selectDiscussPosts(133, 0, 100, 0));
         discussRepository.saveAll(discussMapper.selectDiscussPosts(134, 0, 100, 0));
     }
-
+    
     @Test
     public void testUpdate() { // 修改数据，其实就是调用save方法覆盖一次
         DiscussPost post = discussMapper.selectDiscussPostById(231);
@@ -74,8 +81,8 @@ public class ElasticsearchTests {
 
     @Test
     public void testDelete() { // 删除数据
-        discussRepository.deleteById(231);
-//        discussRepository.deleteAll(); // 删除该索引内的所有数据，危险操作，很少执行
+//        discussRepository.deleteById(231);
+        discussRepository.deleteAll(); // 删除该索引内的所有数据，危险操作，很少执行
     }
 
     @Test
