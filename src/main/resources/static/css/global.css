@@ -5,7 +5,7 @@ html {
 body {
 	/*background: #eee;*/
 	font-family: '楷体', arial, STHeiti, 'Microsoft YaHei', \5b8b\4f53, sans-serif;
-	font-size: 14px;
+	font-size: 16px;
 	height: 100%;
 	background-image: url("../img/landscape.jpg");
 	background-position: center center;
@@ -25,6 +25,10 @@ body {
 	padding: 0;
 }
 
+header{
+	background-color: rgba(52, 58, 64, 0.5);
+}
+
 header .navbar-brand {
 	/*background: url('http://static.nowcoder.com/images/res/logo/logo-v3.png') no-repeat;*/
 	background: url('../img/logo.png') no-repeat;
@@ -36,7 +40,7 @@ header .navbar-brand {
 
 header .navbar {
 	padding: 5px 0;
-	font-size: 16px;
+	font-size: 18px;
 }
 
 header .badge {
@@ -47,7 +51,7 @@ header .badge {
 
 footer {
 	padding: 20px 0;
-	font-size: 12px;
+	font-size: 14px;
 	position: absolute;
 	bottom: 0;
 	width: 100%;
@@ -72,8 +76,26 @@ footer .company-info li {
 }
 
 .main .container {
-	background: #fff;
+	background: rgba(255, 255, 255, 0.5);
 	padding: 20px;
+}
+
+.revise {
+	background-color: rgba(255, 255, 255, 0.5);
+	border-color: rgba(255, 255, 255, 0.5);
+	color: #6c757d;
+}
+
+.page-item.disabled .revise{
+	background-color: rgba(255, 255, 255, 0.5);
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active{
+	background-color: rgba(255, 255, 255, 0.5);
+}
+
+.bottomRevise{
+	background-color: rgba(52, 58, 64, 0.5);
 }
 
 i {
@@ -97,25 +119,25 @@ a:hover {
 }
 
 .font-size-12 {
-	font-size: 12px;
-}
-.font-size-14 {
 	font-size: 14px;
 }
-.font-size-16 {
+.font-size-14 {
 	font-size: 16px;
 }
-.font-size-18 {
+.font-size-16 {
 	font-size: 18px;
 }
-.font-size-20 {
+.font-size-18 {
 	font-size: 20px;
+}
+.font-size-20 {
+	font-size: 22px;
 }
 .font-size-22 {
-	font-size: 20px;
+	font-size: 24px;
 }
 .font-size-24 {
-	font-size: 20px;
+	font-size: 26px;
 }
 
 .hidden {
@@ -137,7 +159,7 @@ a:hover {
 }
 
 .bg-gray {
-	background: #eff0f2;
+	background: rgba(255, 255, 255, 0);
 }
 
 .user-header {
@@ -149,3 +171,4 @@ em {
 	font-style: normal;
 	color: red;
 }
+
