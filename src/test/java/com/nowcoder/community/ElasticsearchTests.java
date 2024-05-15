@@ -50,6 +50,9 @@ public class ElasticsearchTests {
 //        discussRepository.save(discussMapper.selectDiscussPostById(241));
 //        discussRepository.save(discussMapper.selectDiscussPostById(242));
 //        discussRepository.save(discussMapper.selectDiscussPostById(243));
+        for (int i = 109; i <= 249; i++) {
+            discussRepository.save(discussMapper.selectDiscussPostById(i));
+        }
         discussRepository.save(discussMapper.selectDiscussPostById(265));
         for (int i = 270; i <= 277; i++) {
             discussRepository.save(discussMapper.selectDiscussPostById(i));
