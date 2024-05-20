@@ -10,10 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DataService {
@@ -42,9 +39,6 @@ public class DataService {
         while (!calendar.getTime().after(end)) {
             String key = RedisKeyUtil.getUVKey(df.format(calendar.getTime()));
             keyList.add(key);
-
-            //
-
             calendar.add(Calendar.DATE, 1);
         }
 
