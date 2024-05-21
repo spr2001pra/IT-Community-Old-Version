@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,6 +39,17 @@ public class CommunityUtil {
         }
         return json.toJSONString();
     }
+
+      //DataController中getUVList方法初版本返回Json时调用
+//    public static String getJSONStringList(int code, String msg, List<Map<String, String>> list) {
+//        JSONObject json = new JSONObject();
+//        json.put("code", code);
+//        json.put("msg", msg);
+//        if (list != null) {
+//            json.put("list", list);
+//        }
+//        return json.toJSONString();
+//    }
 
     public static String getJSONString(int code, String msg) {
         return getJSONString(code, msg, null);

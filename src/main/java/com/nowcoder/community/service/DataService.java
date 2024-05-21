@@ -1,6 +1,8 @@
 package com.nowcoder.community.service;
 
+import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.RedisKeyUtil;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -24,6 +26,8 @@ public class DataService {
     public void recordUV(String ip) {
         String redisKey = RedisKeyUtil.getUVKey(df.format(new Date()));
         redisTemplate.opsForHyperLogLog().add(redisKey, ip);
+        String redisKeyRecord = RedisKeyUtil.getUVKeyRecord(df.format(new Date()));
+        redisTemplate.opsForSet().add(redisKeyRecord, ip);
     }
 
     // 统计指定日期范围内的UV
@@ -48,6 +52,40 @@ public class DataService {
 
         // 返回统计的结果
         return redisTemplate.opsForHyperLogLog().size(redisKey);
+    }
+
+    // 显示指定时间范围内的UV的统计结果
+    public List<Map<String, String>> calculateUVRecord(Date start, Date end){
+        if (start == null || end == null) {
+            throw new IllegalArgumentException("参数不能为空!");
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        Map<String, String> latestUniqueVisitorMap = new HashMap<>();
+        // 利用map完成每天的独立ip合并
+        while (!calendar.getTime().after(end)){
+            String dateStr = df.format(calendar.getTime());
+            String redisKey = RedisKeyUtil.getUVKeyRecord(dateStr);
+            Set<Object> dailyVisitors = redisTemplate.opsForSet().members(redisKey);
+            if(!dailyVisitors.isEmpty()){
+                for (Object ips : dailyVisitors ){
+                    String ip = ips.toString();
+                    latestUniqueVisitorMap.put(ip, dateStr);
+                }
+            }
+            calendar.add(Calendar.DATE, 1);
+        }
+
+        List<Map<String, String>> res = new ArrayList<>();
+        for (Map.Entry<String, String> entry : latestUniqueVisitorMap.entrySet()){
+            Map<String, String> uniqueVisitor = new HashMap<>();
+            uniqueVisitor.put("ip", entry.getKey());
+            uniqueVisitor.put("date", entry.getValue());
+            res.add(uniqueVisitor);
+        }
+
+        return res;
     }
 
     // 将指定用户计入DAU

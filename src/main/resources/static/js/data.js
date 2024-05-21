@@ -1,6 +1,7 @@
 $(function(){
     $("#dataUV").click(send_data_uv);
     $("#dataDau").click(send_data_dau);
+    $("#uvResult").click(send_data_uv_list);
 });
 
 function send_data_uv() {
@@ -45,5 +46,31 @@ function send_data_dau(){
             $("#hintModal").modal("show");
         }
     );
+}
 
+function send_data_uv_list(){
+    var start = $("#dataUV_start").val();
+    var end = $("#dataUV_end").val();
+
+    $.post(
+        CONTEXT_PATH + "/data/uv/list",
+        {"start":start, "end":end},
+        function (data){
+            data = $.parseJSON(data);
+            if(data.code==0){
+                // 清空表格内容
+                $('#visitorTableBody').empty();
+                // 遍历服务器返回的数据并生成表格行
+                data.unionVisitor.forEach(function(visitor) {
+                    var row = '<tr><td>' + visitor.ip + '</td><td>' + visitor.date + '</td></tr>';
+                    $('#visitorTableBody').append(row);
+                });
+                // 显示模态框
+                $('#dataUV_list').modal('show');
+            }else {
+                $("#hintBody").text(data.msg);
+                $("#hintModal").modal("show");
+            }
+        }
+    );
 }

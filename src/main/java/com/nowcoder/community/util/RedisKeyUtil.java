@@ -13,6 +13,8 @@ public class RedisKeyUtil {
     private static final String PREFIX_UV = "uv";
     private static final String PREFIX_DAU = "dau";
     private static final String PREFIX_POST = "post";
+    private static final String POST_UV = "uvRecord";
+    private static final String POST_DAU = "dauRecord";
 
     // 某个实体的赞
     // like:entity:entityType:entityId -> set(userId)(存数字也可以，但是无法看到点赞的人是谁)
@@ -60,6 +62,10 @@ public class RedisKeyUtil {
     public static String getUVKey(String date) {
         return PREFIX_UV + SPLIT + date;
     }
+    // 统计UV
+    public static String getUVKeyRecord(String date){
+        return POST_UV + SPLIT + date;
+    }
 
     // 区间UV
     public static String getUVKey(String startDate, String endDate) {
@@ -70,6 +76,7 @@ public class RedisKeyUtil {
     public static String getDAUKey(String date) {
         return PREFIX_DAU + SPLIT + date;
     }
+    // 统计活跃用户
 
     // 区间活跃用户
     public static String getDAUKey(String startDate, String endDate) {
