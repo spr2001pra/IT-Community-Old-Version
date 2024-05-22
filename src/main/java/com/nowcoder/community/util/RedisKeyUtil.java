@@ -77,6 +77,9 @@ public class RedisKeyUtil {
         return PREFIX_DAU + SPLIT + date;
     }
     // 统计活跃用户
+    public static String getDAUKeyRecord(String date){
+        return POST_DAU + SPLIT + date;
+    }
 
     // 区间活跃用户
     public static String getDAUKey(String startDate, String endDate) {

@@ -22,6 +22,8 @@ public class DataService {
 
     private SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 
+    private SimpleDateFormat dfShow = new SimpleDateFormat("yyyy-MM-dd");
+
     // 将指定的IP计入UV
     public void recordUV(String ip) {
         String redisKey = RedisKeyUtil.getUVKey(df.format(new Date()));
@@ -66,12 +68,13 @@ public class DataService {
         // 利用map完成每天的独立ip合并
         while (!calendar.getTime().after(end)){
             String dateStr = df.format(calendar.getTime());
+            String dateStrShow = dfShow.format(calendar.getTime());
             String redisKey = RedisKeyUtil.getUVKeyRecord(dateStr);
             Set<Object> dailyVisitors = redisTemplate.opsForSet().members(redisKey);
             if(!dailyVisitors.isEmpty()){
                 for (Object ips : dailyVisitors ){
                     String ip = ips.toString();
-                    latestUniqueVisitorMap.put(ip, dateStr);
+                    latestUniqueVisitorMap.put(ip, dateStrShow);
                 }
             }
             calendar.add(Calendar.DATE, 1);
@@ -92,6 +95,43 @@ public class DataService {
     public void recordDAU(int userId) {
         String redisKey = RedisKeyUtil.getDAUKey(df.format(new Date()));
         redisTemplate.opsForValue().setBit(redisKey, userId, true);
+    }
+
+    // 将指定用户名计入DAU，开发展示列表
+    public void recordDAUUsername(String username){
+        String redisKey = RedisKeyUtil.getDAUKeyRecord(df.format(new Date()));
+        redisTemplate.opsForSet().add(redisKey, username);
+    }
+
+    // 显示指定时间范围内的DAU的统计结果
+    public List<Map<String, String>> calculateDAURecord(Date start, Date end){
+        if(start == null || end == null){
+            throw new IllegalArgumentException("参数不能为空！");
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        Map<String, String> dailyActiveUserMap = new HashMap<>();
+        while(!calendar.getTime().after(end)){
+            String dateStr = df.format(calendar.getTime());
+            String dateStrShow = dfShow.format(calendar.getTime());
+            String redisKey = RedisKeyUtil.getDAUKeyRecord(dateStr);
+            Set<Object> dailyActiveUserSet = redisTemplate.opsForSet().members(redisKey);
+            if(!dailyActiveUserSet.isEmpty()){
+                for (Object names : dailyActiveUserSet){
+                    dailyActiveUserMap.put(names.toString(), dateStrShow);
+                }
+            }
+            calendar.add(Calendar.DATE, 1);
+        }
+
+        List<Map<String, String>> ans = new ArrayList<>();
+        for (Map.Entry<String, String> dailyActiveUserEntry:dailyActiveUserMap.entrySet()){
+            Map<String, String> dailyActiveUser = new HashMap<>();
+            dailyActiveUser.put("username", dailyActiveUserEntry.getKey());
+            dailyActiveUser.put("date", dailyActiveUserEntry.getValue());
+            ans.add(dailyActiveUser);
+        }
+        return ans;
     }
 
     // 统计指定日期范围内的DAU

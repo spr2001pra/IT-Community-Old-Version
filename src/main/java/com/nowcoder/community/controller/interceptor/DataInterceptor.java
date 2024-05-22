@@ -29,6 +29,7 @@ public class DataInterceptor implements HandlerInterceptor {
         User user = hostHolder.getUser();
         if (user != null) {
             dataService.recordDAU(user.getId());
+            dataService.recordDAUUsername(user.getUsername());
         }
 
         return true;

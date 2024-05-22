@@ -82,4 +82,20 @@ public class DataController {
         return CommunityUtil.getJSONString(0, null, map);
     }
 
+    // 显示活跃用户
+    @RequestMapping(path = "/data/dau/list", method = RequestMethod.POST)
+    @ResponseBody
+    public String getDAUList(@DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
+                             @DateTimeFormat(pattern = "yyyy-MM-dd") Date end){
+        if(start == null || end == null){
+            return CommunityUtil.getJSONString(1, "日期不能为空！");
+        }
+        if(start.after(end)){
+            return CommunityUtil.getJSONString(1, "开始日期不能晚于结束日期！");
+        }
+        List<Map<String, String>> dailyActiveUserList = dataService.calculateDAURecord(start, end);
+        Map<String,Object> ans = new HashMap<>();
+        ans.put("dailyActiveUser", dailyActiveUserList);
+        return CommunityUtil.getJSONString(0, null, ans);
+    }
 }

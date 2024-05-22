@@ -2,6 +2,7 @@ $(function(){
     $("#dataUV").click(send_data_uv);
     $("#dataDau").click(send_data_dau);
     $("#uvResult").click(send_data_uv_list);
+    $("#dauResult").click(send_data_dau_list);
 });
 
 function send_data_uv() {
@@ -67,6 +68,30 @@ function send_data_uv_list(){
                 });
                 // 显示模态框
                 $('#dataUV_list').modal('show');
+            }else {
+                $("#hintBody").text(data.msg);
+                $("#hintModal").modal("show");
+            }
+        }
+    );
+}
+
+function send_data_dau_list(){
+    var start = $("#dataDau_start").val();
+    var end = $("#dataDau_end").val();
+
+    $.post(
+        CONTEXT_PATH + "/data/dau/list",
+        {"start":start, "end":end},
+        function (data){
+            data = $.parseJSON(data);
+            if(data.code == 0){
+                $("#DailyActiveUserTableBody").empty();
+                data.dailyActiveUser.forEach(function (user){
+                    var row = "<tr><td>" + user.username + "</td><td>" + user.date + "</td></tr>";
+                    $("#DailyActiveUserTableBody").append(row);
+                });
+                $("#dataDAU_list").modal("show");
             }else {
                 $("#hintBody").text(data.msg);
                 $("#hintModal").modal("show");
