@@ -3,6 +3,8 @@ package com.nowcoder.community.dao;
 import com.nowcoder.community.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
 
@@ -20,4 +22,9 @@ public interface UserMapper {
 
     int updatePassword(int id, String password);
 
+    List<User> selectByAdmin(int id, int offset, int limit);
+
+    int findUserRows();
+
+    int updateType(int id, int type);
 }

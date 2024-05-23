@@ -257,4 +257,20 @@ public class UserService implements CommunityConstant {
         return list;
     }
 
+    public List<User> getUserByAdmin(int userid, int offset, int limit){
+        return userMapper.selectByAdmin(userid, offset, limit);
+    }
+
+    public int getFindUserRows(){
+        return userMapper.findUserRows();
+    }
+
+    public void updateUserStatus(int id, int status){
+        userMapper.updateStatus(id, status);
+    }
+
+    public void updateUserType(int id, int type){
+        userMapper.updateType(id, type);
+    }
+
 }

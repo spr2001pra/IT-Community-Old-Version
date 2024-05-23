@@ -3,15 +3,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-	<!--访问该页面时,在此处生成CSRF令牌.-->
-<!--	<meta name="_csrf" th:content="${_csrf.token}">-->
-<!--	<meta name="_csrf_header" th:content="${_csrf.headerName}">-->
-
 	<link rel="icon" th:href="@{/templates/img/logo.jpg}"/>
 	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" crossorigin="anonymous"/>
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
-	<title>我爱技术网-首页</title>
+	<title>我爱技术网-用户管理</title>
 </head>
 <body>	
 	<div class="nk-container">
@@ -67,29 +62,42 @@
 		<!-- 内容 -->
 		<div class="main">
 			<div class="container">
-				<!-- 帖子列表 -->
+				<!-- 用户列表 -->
 				<ul class="list-unstyled">
-					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="map:${discussPosts}">
+					<li class="media pb-3 pt-3 mb-3 border-bottom position-relative" th:each="map:${userList}">
 						<a th:href="@{|/user/profile/${map.user.id}|}">
-							<img th:src="${map.user.headerUrl}" class="mr-4 rounded-circle" alt="用户头像" style="width:50px;height:50px;">
+							<img th:src="${map.user.headerUrl}" class="mr-4 rounded-circle user-header" alt="用户头像" >
 						</a>
 						<div class="media-body">
-							<h6 class="mt-0 mb-3">
-								<a th:href="@{|/discuss/detail/${map.post.id}|}" th:utext="${map.post.title}">备战春招，面试刷题跟他复习，一个月全搞定！</a>
-								<span class="badge badge-secondary bg-primary" th:if="${map.post.type==1}">置顶</span>
-								<span class="badge badge-secondary bg-danger" th:if="${map.post.status==1}">精华</span>
-							</h6>
-							<div class="text-muted font-size-12">
-								<u class="mr-3" th:utext="${map.user.username}">寒江雪</u> 发布于 <b th:text="${#dates.format(map.post.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</b>
-								<ul class="d-inline float-right">
-									<li class="d-inline ml-2">赞 <span th:text="${map.likeCount}">11</span></li>
-									<li class="d-inline ml-2">|</li>
-									<li class="d-inline ml-2">回帖 <span th:text="${map.post.commentCount}">7</span></li>
-								</ul>
+							<h5 class="mt-0 text-warning">
+								<span th:utext="${map.user.username}">nowcoder</span>
+								<input type="hidden" id="entityId" th:value="${map.user.id}">
+								<button type="button" id="buttonRight" th:onclick="|udType(${map.user.id},${map.user.type});|" th:class="|btn ${map.user.type==1?'btn-secondary':'btn-info'} btn-sm float-right mr-3 follow-btn|"
+										th:text="${map.user.type==1?'已授权':'授权'}">管理员</button>
+							</h5>
+							<div class="text-muted mt-2">
+								<span>注册于 <i class="text-muted" th:text="${#dates.format(map.user.createTime,'yyyy-MM-dd HH:mm:ss')}">2015-06-12 15:20:12</i></span>
+								<button type="button" id="buttonActivation" th:onclick="|udStatus(${map.user.id},${map.user.status});|" th:class="|btn ${map.user.status==0?'btn-secondary':'btn-info'} btn-sm float-right mr-3 mt-1 follow-btn|"
+										th:text="${map.user.status==1?'拉黑':'已拉黑'}">管理员</button>
+
 							</div>
-						</div>						
+						</div>
 					</li>
 				</ul>
+
+				<!-- 提示框 -->
+				<div class="modal fade" id="hintModal" tabindex="-1" role="dialog" aria-labelledby="hintModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="hintModalLabel">提示</h5>
+							</div>
+							<div class="modal-body" id="hintBody">
+								统计完毕!
+							</div>
+						</div>
+					</div>
+				</div>
 
 				<!-- 分页 -->
 				<nav class="mt-5" th:if="${page.rows>0}" th:replace="index::pagination">
@@ -180,6 +188,7 @@
 	<script th:src="@{/js/popper.min.js}" crossorigin="anonymous"></script>
 	<script th:src="@{/js/bootstrap.min.js}" crossorigin="anonymous"></script>
 	<script th:src="@{/js/global.js}"></script>
+	<script th:src="@{/js/userController.js}"></script>
 	<script th:src="@{/js/index.js}"></script>
 </body>
 </html>
