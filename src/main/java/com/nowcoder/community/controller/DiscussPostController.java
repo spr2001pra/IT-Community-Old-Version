@@ -172,8 +172,12 @@ public class DiscussPostController implements CommunityConstant {
     // 置顶
     @RequestMapping(path = "/top", method = RequestMethod.POST)
     @ResponseBody
-    public String setTop(int id) {
-        discussPostService.updateType(id, 1);
+    public String setTop(int id, int type) {
+        if(type == 0){
+            discussPostService.updateType(id, 1);
+        }else {
+            discussPostService.updateType(id, 0);
+        }
 
         // 触发发帖事件
         Event event = new Event()
@@ -183,14 +187,18 @@ public class DiscussPostController implements CommunityConstant {
                 .setEntityId(id);
         eventProducer.fireEvent(event);
 
-        return CommunityUtil.getJSONString(0);
+        return CommunityUtil.getJSONString(0,"操作成功！");
     }
 
     // 加精
     @RequestMapping(path = "/wonderful", method = RequestMethod.POST)
     @ResponseBody
-    public String setWonderful(int id) {
-        discussPostService.updateStatus(id, 1);
+    public String setWonderful(int id, int status) {
+        if(status == 0){
+            discussPostService.updateStatus(id, 1);
+        }else {
+            discussPostService.updateStatus(id, 0);
+        }
 
         // 触发发帖事件
         Event event = new Event()
@@ -204,7 +212,7 @@ public class DiscussPostController implements CommunityConstant {
         String redisKey = RedisKeyUtil.getPostScoreKey();
         redisTemplate.opsForSet().add(redisKey, id);
 
-        return CommunityUtil.getJSONString(0);
+        return CommunityUtil.getJSONString(0, "操作成功！");
     }
 
     // 删除

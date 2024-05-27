@@ -24,14 +24,21 @@ function like(btn, entityType, entityId, entityUserId, postId) {
 function setTop() {
     $.post(
         CONTEXT_PATH + "/discuss/top",
-        {"id":$("#postId").val()},
+        {"id":$("#postId").val(),"type":$("#postType").val()},
         function(data) {
             data = $.parseJSON(data);
             if(data.code == 0) {
-                $("#topBtn").attr("disabled", "disabled");
+                // $("#topBtn").removeClass("btn-danger").addClass("btn-secondary");
+                $("#hintBody").text(data.msg);
             } else {
                 alert(data.msg);
             }
+            $("#hintModal").modal("show");
+            setTimeout(function (){
+                if(data.code==0){
+                    window.location.reload();
+                }
+            }, 500);
         }
     );
 }
@@ -40,14 +47,22 @@ function setTop() {
 function setWonderful() {
     $.post(
         CONTEXT_PATH + "/discuss/wonderful",
-        {"id":$("#postId").val()},
+        {"id":$("#postId").val(), "status":$("#postStatus").val()},
         function(data) {
             data = $.parseJSON(data);
             if(data.code == 0) {
-                $("#wonderfulBtn").attr("disabled", "disabled");
+                // $("#wonderfulBtn").attr("disabled", "disabled");
+                $("#hintBody").text(data.msg);
             } else {
                 alert(data.msg);
             }
+            $("#hintModal").modal("show");
+            setTimeout(function (){
+                if(data.code == 0){
+                    window.location.reload();
+                }
+            }, 500);
+
         }
     );
 }
